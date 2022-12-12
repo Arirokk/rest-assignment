@@ -39,7 +39,6 @@ public class RESTServerApp {
     public void init() {
         // Add the init user into user table
         userRepo.save(new User("admin", "qwerty"));
-        // System.out.println("PostConstruct works well");
     }
 
     // POST requests handling to the "/messenger" endpoint
@@ -51,7 +50,7 @@ public class RESTServerApp {
         messageRepo.save(new Message(user, messageResponse.getMessage()));
     }
 
-    // POST requests handling to the "/messenger" endpoint
+    // POST requests handling to the "/token" endpoint
     // Checks login and password if ok return token
     @PostMapping("/token")
 

@@ -4,7 +4,7 @@ Here is a RESTful HTTP server on Spring with two POST endpoints and H2 in memory
 ### How to test
 You can download the project
 ```
-$ git clone https://
+$ git clone https://github.com/Arirokk/rest-assignment
 ```
 Then start it with Gradle in Terminal or in your IDE
 #### Curl requests:
