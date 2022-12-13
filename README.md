@@ -1,12 +1,15 @@
 ## The-Inside assignment
 Here is a RESTful HTTP server on Spring with two POST endpoints and H2 in memory database where you can log in and send messages into
-
 ### How to test
-You can download the project
+You can download the project  
 ```
-$ git clone https://github.com/Arirokk/rest-assignment
+git clone https://github.com/Arirokk/rest-assignment
 ```
-Then start it with Gradle in Terminal or in your IDE
+Then start it with Gradle in Terminal or in your IDE  
+Or you can use [docker image](https://hub.docker.com/repository/docker/arirokk/restserverapp) (H2 console is on)
+```
+docker pull arirokk/restserverapp
+```
 #### Curl requests:
 I suggest testing with curl in Terminal  
 Port: 3000  
