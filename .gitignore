@@ -36,5 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-### Docker ###
+
 Dockerfile
+test assignment inside.txt
