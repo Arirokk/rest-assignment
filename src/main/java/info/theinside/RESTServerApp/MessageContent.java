@@ -1,14 +1,14 @@
 package info.theinside.RESTServerApp;
 
 // Class to instantiate responses in /messenger endpoint
-public class MessageResponse {
+public class MessageContent {
     private String name;
     private String message;
 
-    public MessageResponse() {
+    public MessageContent() {
     }
 
-    public MessageResponse(String name, String message) {
+    public MessageContent(String name, String message) {
         this.name = name;
         this.message = message;
     }

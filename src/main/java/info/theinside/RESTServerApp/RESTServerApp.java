@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 // Spring configuration initialization
-// It'll scan all dependencies and let us use autowired
+// It'll scan all dependencies and let us use Autowired
 @SpringBootApplication
 // RESTful's methods to handle incoming HTTP requests
 @RestController
@@ -34,39 +34,43 @@ public class RESTServerApp {
         SpringApplication.run(RESTServerApp.class, args);
     }
 
-    // Run after app started
+    // Run right after app started
     @PostConstruct
     public void init() {
         // Add the init user into user table
         userRepo.save(new User("admin", "qwerty"));
     }
 
-    // POST requests handling to the "/messenger" endpoint
+    // POST requests handling at the "/messenger" endpoint
+    // Better to rename in ...args and args as a parameter
     @PostMapping("/messenger")
-    public void getMessage(@RequestBody MessageResponse messageResponse) {
+    // Method gets request body as a parameter that uses Message
+    public void postMessage(@RequestBody MessageContent messageContent) {
         // Find user in DB
-        User user = userRepo.findByName(messageResponse.getName());
+        User user = userRepo.findByName(messageContent.getName());
         // Save message in DB
-        messageRepo.save(new Message(user, messageResponse.getMessage()));
+        messageRepo.save(new Message(user, messageContent.getMessage()));
     }
 
     // POST requests handling to the "/token" endpoint
-    // Checks login and password if ok return token
+    // Checks login and password if ok, return token
     @PostMapping("/token")
-
+    // ResponseEntity will be sent from endpoint
     // TokenResponse is instance holds token in string to be returned
     // CreateTokenArgs is instance from request body (reads json)
     // Exceptions to send error codes as response
     public ResponseEntity<TokenResponse> createToken(@RequestBody CreateTokenArgs args) throws Exception {
+        // Check if RequestBody was caught
         System.out.println("name is " + args.name);
         System.out.println("password is " + args.password);
+        // Find user with the name
         User user = userRepo.findByName(args.name);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         } else {
-            System.out.println("Got it");
+            System.out.println("----name match");
             if (args.password.equals(user.getPassword())) {
-                System.out.println("password match");
+                System.out.println("----password match");
                 // We need a method to create a token as a string to put it here
                 return ResponseEntity.ok(new TokenResponse("Here is a token"));
             } else {
