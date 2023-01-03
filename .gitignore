@@ -1,6 +1,10 @@
 Test.java
 HELP.md
 .gradle
+.DS_Store .
+Dockerfile
+test assignment inside.txt
+
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -38,5 +42,4 @@ out/
 .vscode/
 
 
-Dockerfile
-test assignment inside.txt
+

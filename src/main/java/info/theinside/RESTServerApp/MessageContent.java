@@ -2,9 +2,9 @@ package info.theinside.RESTServerApp;
 
 // Class to instantiate responses in /messenger endpoint
 public class MessageContent {
-    private String name;
-    private String message;
-
+    public String name;
+    public String message;
+/*
     public MessageContent() {
     }
 
@@ -27,5 +27,5 @@ public class MessageContent {
 
     public void setMessage(String message) {
         this.message = message;
-    }
+    }*/
 }

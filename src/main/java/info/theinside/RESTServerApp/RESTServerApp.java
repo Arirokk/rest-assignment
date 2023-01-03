@@ -7,6 +7,9 @@
 
 package info.theinside.RESTServerApp;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -15,15 +18,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import java.security.Key;
 
 // Spring configuration initialization
 // It'll scan all dependencies and let us use Autowired
 @SpringBootApplication
-// RESTful's methods to handle incoming HTTP requests
+// turns on RESTful's methods to handle incoming HTTP requests
 @RestController
 public class RESTServerApp {
-
-    // Injecting a pass to DB
+    // We'll store it here to prevent changing during one server session
+    private Key secret;
+    // Injecting passes to DBs
     @Autowired
     private UserRepo userRepo;
     @Autowired
@@ -34,45 +39,60 @@ public class RESTServerApp {
         SpringApplication.run(RESTServerApp.class, args);
     }
 
-    // Run right after app started
+    // Run right after the app started
     @PostConstruct
     public void init() {
         // Add the init user into user table
         userRepo.save(new User("admin", "qwerty"));
     }
-
-    // POST requests handling at the "/messenger" endpoint
-    // Better to rename in ...args and args as a parameter
-    @PostMapping("/messenger")
-    // Method gets request body as a parameter that uses Message
-    public void postMessage(@RequestBody MessageContent messageContent) {
-        // Find user in DB
-        User user = userRepo.findByName(messageContent.getName());
-        // Save message in DB
-        messageRepo.save(new Message(user, messageContent.getMessage()));
+    @PostConstruct
+    private Key generateSecretKey() {
+        secret = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        return secret;
     }
 
-    // POST requests handling to the "/token" endpoint
-    // Checks login and password if ok, return token
+    // POST requests handling
+    @PostMapping("/messenger")
+    // Method gets a request body as a parameter that uses Message
+    // todo this EP gets name+message, but checks bearer from header
+    public void postMessage(@RequestBody MessageContent args) throws Exception {
+        // Find user in DB
+        User user = userRepo.findByName(args.name);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        } else {
+            // Save message in DB
+            messageRepo.save(new Message(user, args.message));
+        }
+    }
+
+    // Checks login and password, if ok, returns a token
     @PostMapping("/token")
-    // ResponseEntity will be sent from endpoint
-    // TokenResponse is instance holds token in string to be returned
+    // ResponseEntity will be sent from the endpoint
+    // TokenResponse is instance that holds token in string to be returned
     // CreateTokenArgs is instance from request body (reads json)
     // Exceptions to send error codes as response
     public ResponseEntity<TokenResponse> createToken(@RequestBody CreateTokenArgs args) throws Exception {
+        // To store token (maybe it's better to move to scope above)
+        String jws;
         // Check if RequestBody was caught
         System.out.println("name is " + args.name);
         System.out.println("password is " + args.password);
         // Find user with the name
         User user = userRepo.findByName(args.name);
         if (user == null) {
+            // HttpStatus.java to choose the code
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         } else {
             System.out.println("----name match");
             if (args.password.equals(user.getPassword())) {
                 System.out.println("----password match");
                 // We need a method to create a token as a string to put it here
-                return ResponseEntity.ok(new TokenResponse("Here is a token"));
+                jws = Jwts.builder()
+                        .claim("name", args.name)
+                        .signWith(secret)
+                        .compact();
+                return ResponseEntity.ok(new TokenResponse(jws));
             } else {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
             }
